@@ -18,28 +18,27 @@ namespace ASPNETCore_StoredProcs.Data
             _connectionString = configuration.GetConnectionString("defaultConnection");
         }
 
-        public async Task<List<chanBay>> GetAll()
-        {
-            using (SqlConnection sql = new SqlConnection(_connectionString))
-            {
-                using (SqlCommand cmd = new SqlCommand("GetAll", sql))
-                {
-                    cmd.CommandType = System.Data.CommandType.StoredProcedure;
-                    var response = new List<chanBay>();
-                    await sql.OpenAsync();
+        //public DataTable GetAll(string diemDi,string diemDen)
+        //{
+        //    DataTable dt = new DataTable();
+        //    using (SqlConnection sql = new SqlConnection(_connectionString))
+        //    {
+        //        using (SqlCommand cmd = new SqlCommand("GetAll", sql))
+        //        {
+        //            cmd.CommandType = System.Data.CommandType.StoredProcedure;
+        //            cmd.Parameters.Add(new SqlParameter("@diemDi",diemDi));
+        //            cmd.Parameters.Add(new SqlParameter("@diemDen", diemDen));
+        //            sql.Open();
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
-                    {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToValue(reader));
-                        }
-                    }
+        //            using (SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd))
+        //            {
+        //                sqlAdapter.Fill(dt);
 
-                    return response;
-                }
-            }
-        }
+        //                return dt;
+        //            }
+        //        }
+        //    }
+        //}
 
         private chanBay MapToValue(SqlDataReader reader)
         {
@@ -60,8 +59,9 @@ namespace ASPNETCore_StoredProcs.Data
             };
         }
 
-        public async Task<List<chanBay>>Sreach_Ticket(string diemDi, string diemDen, int khuHoi, DateTime NgayDi, DateTime NgayVe, int SlNgLon, int SlTreEm, int SlTreSs)
+        public DataTable Sreach_Ticket(string diemDi, string diemDen, int khuHoi, DateTime NgayDi, DateTime NgayVe, int SlNgLon, int SlTreEm, int SlTreSs)
         {
+            DataTable dt = new DataTable();
             using (SqlConnection sql = new SqlConnection(_connectionString))
             {
                 using (SqlCommand cmd = new SqlCommand("Sreach_Tikect", sql))
@@ -75,17 +75,14 @@ namespace ASPNETCore_StoredProcs.Data
                     cmd.Parameters.Add(new SqlParameter("@SLNguoiLon", SlNgLon));
                     cmd.Parameters.Add(new SqlParameter("@SlTreEm", SlTreEm));
                     cmd.Parameters.Add(new SqlParameter("@SLTreSs", SlTreSs));
-                    var response = new List<chanBay>();
-                    await sql.OpenAsync();
+                    sql.Open();
 
-                    using (var reader = await cmd.ExecuteReaderAsync())
+                    using (SqlDataAdapter sqlAdapter = new SqlDataAdapter(cmd))
                     {
-                        while (await reader.ReadAsync())
-                        {
-                            response.Add(MapToValue(reader));
-                        }
+                        sqlAdapter.Fill(dt);
+
+                        return dt;
                     }
-                    return response;
                 }
             }
         }
